@@ -1,342 +1,81 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>HAND HOLOGRAM // gesture core</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg: #05070a;
-    --panel: #0a0f14;
-    --line: #12333d;
-    --core: #ff5a2e;
-    --core-dim: #7a2b14;
-    --cyan: #3ee6ff;
-    --magenta: #ff2e88;
-    --text: #cfeff2;
-    --text-dim: #4d7480;
-  }
-  *{box-sizing:border-box;}
-  html,body{
-    margin:0; padding:0; width:100%; height:100%;
-    background:var(--bg); color:var(--text);
-    font-family:'JetBrains Mono', monospace;
-    overflow:hidden; overscroll-behavior:none;
-  }
-  #scene{ position:fixed; inset:0; z-index:1; }
-  #video{
-    position:fixed; inset:0; width:100%; height:100%;
-    object-fit:cover; transform:scaleX(-1);
-    opacity:0.22; z-index:0;
-    filter:contrast(1.1) saturate(0.6);
-  }
-  #overlay{ position:fixed; inset:0; z-index:2; pointer-events:none; }
-
-  /* HUD frame */
-  .hud-corner{
-    position:fixed; width:22px; height:22px; z-index:5;
-    border-color:var(--cyan); opacity:0.7;
-  }
-  .hud-corner.tl{ top:14px; left:14px; border-top:2px solid; border-left:2px solid; }
-  .hud-corner.tr{ top:14px; right:14px; border-top:2px solid; border-right:2px solid; }
-  .hud-corner.bl{ bottom:14px; left:14px; border-bottom:2px solid; border-left:2px solid; }
-  .hud-corner.br{ bottom:14px; right:14px; border-bottom:2px solid; border-right:2px solid; }
-
-  #topbar{
-    position:fixed; top:14px; left:46px; right:46px; z-index:5;
-    display:flex; justify-content:space-between; align-items:center;
-    font-size:11px; letter-spacing:0.12em; color:var(--text-dim);
-    text-transform:uppercase;
-  }
-  #topbar .brand{ color:var(--core); font-weight:700; letter-spacing:0.18em; }
-  #status{ display:flex; align-items:center; gap:6px; }
-  #status .dot{ width:6px; height:6px; border-radius:50%; background:var(--text-dim); }
-  #status.live .dot{ background:var(--cyan); box-shadow:0 0 8px var(--cyan); animation:pulse 1.4s infinite; }
-  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.35;} }
-
-  #bottombar{
-    position:fixed; bottom:22px; left:0; right:0; z-index:5;
-    display:flex; flex-direction:column; align-items:center; gap:10px;
-    padding:0 24px; text-align:center;
-  }
-  #hint{
-    font-size:11px; color:var(--text-dim); letter-spacing:0.08em;
-    max-width:320px;
-  }
-  #startBtn{
-    pointer-events:auto;
-    background:transparent; border:1px solid var(--core);
-    color:var(--core); font-family:'JetBrains Mono', monospace;
-    font-size:12px; letter-spacing:0.15em; text-transform:uppercase;
-    padding:12px 28px; cursor:pointer; border-radius:2px;
-    transition:all .25s ease;
-  }
-  #startBtn:hover{ background:var(--core); color:#050505; box-shadow:0 0 24px rgba(255,90,46,0.5); }
-
-  /* gesture reveal text */
-  #gestureText{
-    position:fixed; top:50%; left:50%; z-index:6;
-    transform:translate(-50%,-50%) scale(0.85);
-    font-family:'Orbitron', sans-serif; font-weight:900;
-    font-size:clamp(28px, 8vw, 56px);
-    letter-spacing:0.06em;
-    color:var(--core);
-    text-shadow:0 0 12px rgba(255,90,46,0.9), 0 0 40px rgba(255,90,46,0.5);
-    opacity:0; pointer-events:none;
-    transition:opacity .35s ease, transform .35s ease;
-  }
-  #gestureText.show{ opacity:1; transform:translate(-50%,-50%) scale(1); }
-
-  /* tracking box (mimics the magenta bounding box style) */
-  #trackBox{
-    position:fixed; z-index:4; border:1.5px solid var(--magenta);
-    box-shadow:0 0 10px rgba(255,46,136,0.5);
-    display:none; pointer-events:none;
-  }
-  #trackBox::before{
-    content:attr(data-label);
-    position:absolute; top:-18px; left:-2px;
-    font-size:9px; letter-spacing:0.1em; color:var(--magenta);
-    text-transform:uppercase;
-  }
-
-  #readout{
-    position:fixed; left:14px; bottom:56px; z-index:5;
-    font-size:10px; line-height:1.6; color:var(--text-dim);
-    letter-spacing:0.04em;
-  }
-  #readout b{ color:var(--cyan); font-weight:500; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>hyuuXx Injector</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="glow-text">🔥 hyuuXx 777</div>
+            <div class="subtitle">MINSTESION INJECTOR ENGINE</div>
+            <div class="status-badge" id="statusBadge">⚡ SYSTEM READY</div>
+        </div>
 
-<video id="video" autoplay playsinline muted></video>
-<div id="scene"></div>
-<canvas id="overlay"></canvas>
+        <!-- CARD UTAMA -->
+        <div class="card">
+            <div class="card-title">🎯 AUTO HEADSHOT FREE FIRE</div>
+            <div class="card-sub">Web Injector via Shizuku + Root</div>
+            
+            <!-- Status -->
+            <div class="status-box" id="statusBox">
+                <div class="status-icon">🔴</div>
+                <div class="status-text" id="statusText">Menunggu koneksi...</div>
+            </div>
 
-<div class="hud-corner tl"></div>
-<div class="hud-corner tr"></div>
-<div class="hud-corner bl"></div>
-<div class="hud-corner br"></div>
+            <!-- Tombol -->
+            <button class="btn btn-primary" id="startBtn" onclick="startInjector()">
+                🚀 AKTIFKAN INJECTOR
+            </button>
+            <button class="btn btn-danger" id="stopBtn" onclick="stopInjector()" style="display:none;">
+                ⛔ STOP INJECTOR
+            </button>
 
-<div id="topbar">
-  <div class="brand">GESTURE CORE</div>
-  <div id="status"><span class="dot"></span><span id="statusText">standby</span></div>
-</div>
+            <!-- Statistik -->
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="headshotCount">0</div>
+                    <div class="stat-label">🎯 Headshot</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="missCount">0</div>
+                    <div class="stat-label">❌ Miss</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="killCount">0</div>
+                    <div class="stat-label">💀 Total Kill</div>
+                </div>
+            </div>
 
-<div id="trackBox" data-label="hand"></div>
-<div id="gestureText"></div>
-<div id="readout"></div>
+            <!-- Log -->
+            <div class="log-box" id="logBox">
+                <div class="log-entry">[hyuuXx] Sistem siap...</div>
+                <div class="log-entry">[hyuuXx] Tunggu perintah Anda...</div>
+            </div>
+        </div>
 
-<div id="bottombar">
-  <div id="hint">Arahin kamera depan ke tanganmu. Gerakin tangan buat kontrol partikel — kasih isyarat ILY buat nyalain teks.</div>
-  <button id="startBtn">Aktifkan Kamera</button>
-</div>
+        <!-- MENU -->
+        <div class="menu-grid">
+            <div class="menu-item" onclick="showMenu('makan')">🍽️ MAKAN</div>
+            <div class="menu-item" onclick="showMenu('code')">💻 CODE</div>
+            <div class="menu-item" onclick="showMenu('guide')">📖 GUIDE</div>
+            <div class="menu-item" onclick="showMenu('bicdos')">💣 BICDOS</div>
+            <div class="menu-item" onclick="showMenu('necroneon')">💀 NECRONEON</div>
+            <div class="menu-item" onclick="showMenu('real')">🔥 REAL LIFE</div>
+            <div class="menu-item" onclick="showMenu('kudeta')">👑 KUDETA</div>
+            <div class="menu-item" onclick="showMenu('spesial')">✨ SPESIAL</div>
+        </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+        <!-- FOOTER -->
+        <div class="footer">
+            ⚠️ Gunakan dengan risiko sendiri | 🔥 hyuuXx 777
+            <br><span style="font-size:10px;color:#666;">"Batas adalah ilusi, aku adalah buktinya!"</span>
+        </div>
+    </div>
 
-<script>
-/* ---------- THREE.JS HOLOGRAM CORE ---------- */
-let scene, camera, renderer, particleSystem, ringGroup;
-let targetRotX = 0, targetRotY = 0, curRotX = 0, curRotY = 0;
-let targetScale = 1, curScale = 1;
-
-function initScene(){
-  scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 100);
-  camera.position.z = 5.2;
-
-  renderer = new THREE.WebGLRenderer({ canvas: undefined, alpha: true, antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  document.getElementById('scene').appendChild(renderer.domElement);
-
-  // particle sphere (the "core")
-  const count = 2200;
-  const positions = new Float32Array(count * 3);
-  const colors = new Float32Array(count * 3);
-  const coreColor = new THREE.Color(0xff5a2e);
-  const cyanColor = new THREE.Color(0x3ee6ff);
-
-  for(let i=0;i<count;i++){
-    const phi = Math.acos(-1 + (2*i)/count);
-    const theta = Math.sqrt(count * Math.PI) * phi;
-    const r = 1.7 + (Math.random()-0.5)*0.15;
-    const x = r * Math.cos(theta) * Math.sin(phi);
-    const y = r * Math.sin(theta) * Math.sin(phi);
-    const z = r * Math.cos(phi);
-    positions[i*3] = x; positions[i*3+1] = y; positions[i*3+2] = z;
-    const mix = Math.random() < 0.85 ? coreColor : cyanColor;
-    colors[i*3] = mix.r; colors[i*3+1] = mix.g; colors[i*3+2] = mix.b;
-  }
-
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-  const mat = new THREE.PointsMaterial({
-    size: 0.028, vertexColors: true, transparent: true,
-    opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false
-  });
-
-  particleSystem = new THREE.Points(geo, mat);
-  scene.add(particleSystem);
-
-  // orbiting rings (like the tilted rings in the reference clip)
-  ringGroup = new THREE.Group();
-  const ringDefs = [
-    { radius: 2.3, tilt: 0.5, color: 0xff5a2e, opacity: 0.5 },
-    { radius: 2.55, tilt: -0.35, color: 0x3ee6ff, opacity: 0.3 },
-  ];
-  ringDefs.forEach(def=>{
-    const ringGeo = new THREE.RingGeometry(def.radius, def.radius + 0.012, 128);
-    const ringMat = new THREE.MeshBasicMaterial({
-      color: def.color, side: THREE.DoubleSide, transparent: true,
-      opacity: def.opacity, blending: THREE.AdditiveBlending
-    });
-    const mesh = new THREE.Mesh(ringGeo, ringMat);
-    mesh.rotation.x = Math.PI/2 + def.tilt;
-    ringGroup.add(mesh);
-  });
-  scene.add(ringGroup);
-
-  window.addEventListener('resize', onResize);
-}
-
-function onResize(){
-  camera.aspect = window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-}
-
-function animate(){
-  requestAnimationFrame(animate);
-  curRotX += (targetRotX - curRotX) * 0.06;
-  curRotY += (targetRotY - curRotY) * 0.06;
-  curScale += (targetScale - curScale) * 0.08;
-
-  particleSystem.rotation.y += 0.0022;
-  particleSystem.rotation.x = curRotX;
-  particleSystem.rotation.y += curRotY * 0.01;
-  particleSystem.scale.setScalar(curScale);
-
-  ringGroup.rotation.y -= 0.0015;
-  ringGroup.rotation.z = curRotX * 0.6;
-  ringGroup.scale.setScalar(curScale);
-
-  renderer.render(scene, camera);
-}
-
-/* ---------- MEDIAPIPE HANDS ---------- */
-const videoEl = document.getElementById('video');
-const trackBox = document.getElementById('trackBox');
-const gestureText = document.getElementById('gestureText');
-const readout = document.getElementById('readout');
-const statusEl = document.getElementById('status');
-const statusText = document.getElementById('statusText');
-
-let lastGestureAt = 0;
-let camInstance = null;
-
-function dist(a,b){
-  return Math.hypot(a.x-b.x, a.y-b.y, (a.z||0)-(b.z||0));
-}
-
-function isFingerExtended(lm, tip, pip, mcp){
-  // rough heuristic: tip further from wrist than pip
-  return dist(lm[0], lm[tip]) > dist(lm[0], lm[pip]);
-}
-
-function detectILY(lm){
-  // ASL "I love you": thumb + index + pinky extended, middle + ring folded
-  const thumb  = isFingerExtended(lm, 4, 3, 2);
-  const index  = isFingerExtended(lm, 8, 6, 5);
-  const middle = isFingerExtended(lm, 12, 10, 9);
-  const ring   = isFingerExtended(lm, 16, 14, 13);
-  const pinky  = isFingerExtended(lm, 20, 18, 17);
-  return thumb && index && pinky && !middle && !ring;
-}
-
-function onResults(results){
-  if(results.multiHandLandmarks && results.multiHandLandmarks.length > 0){
-    statusEl.classList.add('live');
-    statusText.textContent = 'tracking';
-
-    const lm = results.multiHandLandmarks[0];
-
-    // bounding box in screen space (mirrored)
-    let minX=1,maxX=0,minY=1,maxY=0;
-    lm.forEach(p=>{ minX=Math.min(minX,p.x); maxX=Math.max(maxX,p.x); minY=Math.min(minY,p.y); maxY=Math.max(maxY,p.y); });
-    const vw = window.innerWidth, vh = window.innerHeight;
-    const mirroredMinX = 1 - maxX;
-    const mirroredMaxX = 1 - minX;
-    trackBox.style.display = 'block';
-    trackBox.style.left = (mirroredMinX*vw - 10) + 'px';
-    trackBox.style.top = (minY*vh - 10) + 'px';
-    trackBox.style.width = ((mirroredMaxX-mirroredMinX)*vw + 20) + 'px';
-    trackBox.style.height = ((maxY-minY)*vh + 20) + 'px';
-
-    // drive hologram with wrist/palm position
-    const palm = lm[9];
-    targetRotX = (palm.y - 0.5) * 1.4;
-    targetRotY = (0.5 - palm.x) * 2.2;
-    const spread = dist(lm[4], lm[20]);
-    targetScale = THREE.MathUtils.clamp(spread * 4.2, 0.7, 1.9);
-
-    readout.innerHTML = `<b>x</b> ${palm.x.toFixed(2)} &nbsp; <b>y</b> ${palm.y.toFixed(2)} &nbsp; <b>spread</b> ${spread.toFixed(2)}`;
-
-    if(detectILY(lm)){
-      lastGestureAt = performance.now();
-      gestureText.textContent = 'I LOVE YOU';
-      gestureText.classList.add('show');
-    } else if(performance.now() - lastGestureAt > 600){
-      gestureText.classList.remove('show');
-    }
-
-  } else {
-    statusEl.classList.remove('live');
-    statusText.textContent = 'no hand';
-    trackBox.style.display = 'none';
-    targetScale = 1; targetRotX *= 0.9; targetRotY *= 0.9;
-    readout.innerHTML = '';
-  }
-}
-
-async function start(){
-  document.getElementById('startBtn').textContent = 'Menyalakan…';
-  initScene();
-  animate();
-
-  const hands = new Hands({ locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
-  hands.setOptions({
-    maxNumHands: 1,
-    modelComplexity: 1,
-    minDetectionConfidence: 0.6,
-    minTrackingConfidence: 0.6
-  });
-  hands.onResults(onResults);
-
-  camInstance = new Camera(videoEl, {
-    onFrame: async () => { await hands.send({ image: videoEl }); },
-    width: 640, height: 480,
-    facingMode: 'user'
-  });
-  await camInstance.start();
-
-  document.getElementById('bottombar').style.display = 'none';
-}
-
-document.getElementById('startBtn').addEventListener('click', () => {
-  start().catch(err=>{
-    statusText.textContent = 'gagal akses kamera';
-    console.error(err);
-    alert('Nggak bisa akses kamera: ' + err.message + '\n\nPastikan buka via HTTPS dan izinkan akses kamera.');
-  });
-});
-</script>
+    <script src="script.js"></script>
 </body>
 </html>
